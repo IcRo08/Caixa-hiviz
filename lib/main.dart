@@ -1,4 +1,4 @@
-import 'dart:convert'; 
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +20,14 @@ const String NOME_LOJA = "HIVIZ ACESSÓRIOS";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: SUPABASE_URL, anonKey: SUPABASE_KEY);
+  try {
+    await Supabase.instance.client.auth.signInWithPassword(
+      email: 'caixa01@hiviz.com', // Crie esse user no Supabase
+      password: 'vendahiviz1944'
+    );
+  } catch (e) {
+    print("Erro ao logar caixa: $e");
+  }
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(const AppCaixaTV());
 }
@@ -140,7 +148,7 @@ class _CaixaPageState extends State<CaixaPage> {
       (p) {
         // 1. Pega a string inteira do banco (ex: "789, 123, 456")
         final String rawCodes = (p['codigo_barras'] ?? '').toString().toLowerCase();
-        
+
         // 2. Quebra nas vírgulas criando uma lista (ex: ["789", " 123", " 456"])
         final List<String> listaCodigos = rawCodes.split(',');
 
@@ -234,24 +242,24 @@ class _CaixaPageState extends State<CaixaPage> {
             pw.Text(real.format(subtotal), style: const pw.TextStyle(fontSize: 10)),
           ]),
           if (valorTaxa > 0.05)
-      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-        pw.Text('Taxa Maq.:', style: const pw.TextStyle(fontSize: 10)),
-        pw.Text(real.format(valorTaxa), style: const pw.TextStyle(fontSize: 10)),
-      ]),
-      pw.SizedBox(height: 2),
-      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-        pw.Text('TOTAL:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        pw.Text(real.format(valorFinal), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-      ]),
-      pw.SizedBox(height: 5),
-      pw.Text('Pagamento: $tipoPagamento', style: const pw.TextStyle(fontSize: 10)),
-      if (tipoPagamento == 'DINHEIRO') ...[
-        pw.Text('Pago: ${real.format(valorPago)}', style: const pw.TextStyle(fontSize: 10)),
-        pw.Text('Troco: ${real.format(troco)}', style: const pw.TextStyle(fontSize: 10)),
-      ],
-      pw.SizedBox(height: 10),
-      pw.Center(child: pw.Text('Obrigado pela preferencia!', style: const pw.TextStyle(fontSize: 10))),
-      pw.SizedBox(height: 20),
+            pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+              pw.Text('Taxa Maq.:', style: const pw.TextStyle(fontSize: 10)),
+              pw.Text(real.format(valorTaxa), style: const pw.TextStyle(fontSize: 10)),
+            ]),
+            pw.SizedBox(height: 2),
+            pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+              pw.Text('TOTAL:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text(real.format(valorFinal), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            ]),
+            pw.SizedBox(height: 5),
+            pw.Text('Pagamento: $tipoPagamento', style: const pw.TextStyle(fontSize: 10)),
+            if (tipoPagamento == 'DINHEIRO') ...[
+              pw.Text('Pago: ${real.format(valorPago)}', style: const pw.TextStyle(fontSize: 10)),
+              pw.Text('Troco: ${real.format(troco)}', style: const pw.TextStyle(fontSize: 10)),
+            ],
+            pw.SizedBox(height: 10),
+            pw.Center(child: pw.Text('Obrigado pela preferencia!', style: const pw.TextStyle(fontSize: 10))),
+            pw.SizedBox(height: 20),
         ],
       );
     }
